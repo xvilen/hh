@@ -200,7 +200,7 @@ exports.accounting = async (req) => {
         const productDetails = products[list.productId.toString()];
         return {
           ...list,
-          productDetails: !productDetails ? {} : productDetails,
+          productDetails: !productDetails ? {} : (productDetails),
         };
       }
     );
@@ -247,7 +247,13 @@ exports.accounting = async (req) => {
           ...vendorDetails[vendorId]._doc,
           shippingCost: vendorShippingCosts[vendorId],
         },
-        products: orderAccounting.cartAccountingList[vendorId],
+        products: orderAccounting.cartAccountingList[vendorId].map(item=>{
+		if(item.productDetails.status==='P'){
+			item.productDetails=item.productDetails.oldDetails
+			item.productDetails.oldDetails=null;
+		}
+		return item;
+	}),
       });
     }
     orderAccounting.cartAccountingList = finalGroupedObject;
